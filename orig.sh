@@ -1,3 +1,4 @@
+```
 #!/bin/bash
 
 FILENAME="my_commands.txt"
@@ -7,3 +8,4 @@ for LINE in LINES
 do
         execute $LINE
 done
+```
