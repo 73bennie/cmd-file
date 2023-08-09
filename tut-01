@@ -1,0 +1,92 @@
+## Tutorial 01 - Reading and executing commands from a file
+
+Here is our orignal code for review:
+
+```bash
+#!/bin/bash
+
+FILENAME="my_commands.txt"
+LINES=$(cat $FILENAME)
+
+for LINE in LINES
+do
+  execute $LINE
+done
+```
+
+Let's create a new executable named 'comfile.sh' in our /bin directory containing this code, make it executable with ``` sudo chmod +x /bin/comfile.sh ``` and run it:
+
+```
+> comfile.sh 
+> cat: my_commands.txt: No such file or directory
+> /usr/bin/comfile.sh: line 8: execute: command not found
+```
+
+Here we see two errors right away. The first pertains to the 'cat' command. It's stating that it cannot find the 'my_commands.txt' file within the directory that we are currently in. So let's create it with ``` touch my_commands.txt ``` and rerun it. For our purposes the my_commands.txt file will be edited to contain only the 'ls' command for now:
+
+```
+> comfile.sh 
+> /usr/bin/comfile.sh: line 8: execute: command not found
+```
+
+Here we see that line 8, ``` execute $LINE ``` produces an error because there is, in fact, no command named 'execute' in our system. There is, however, the 'exec' command, which was probably what was intended. There is also the 'eval' command. We will go into more detail about these later. For now we will keep it simple. In Bash, you can use the variable containing a command directly without needing eval or exec to execute it. When you use the variable directly, it's treated as a command and executed as if it were typed into the terminal. 
+
+Here is our updated code:
+
+```
+#!/bin/bash
+
+FILENAME="my_commands.txt"
+LINES=$(cat "$FILENAME")
+
+for LINE in LINES
+do
+    $LINE
+done
+```
+
+And running our script again we get:
+
+```
+> comfile.sh 
+> /usr/bin/comfile.sh: line 7: LINES: command not found
+```
+
+The error message we encounter here is misleading because it's not directly indicating the exact line where the error is occurring. Remember that in line 7, which is simply ``` $LINE ``` , we are attempting to use the variable $LINE as a command. The actual issue is on line 6 
+
+``` for LINE in LINES; do ```
+
+where we are improperly using  ``` LINES ``` as if it were a command. The correct syntax should be  
+
+``` for LINE in $LINES; do ``` 
+
+to iterate over the lines stored in the LINES **variable** as defined in line 4 ``` LINES=$(cat "$FILENAME") ```.
+
+Here is our corrected code:
+
+```bash
+#!/bin/bash
+
+FILENAME="my_commands.txt"
+LINES=$(cat "$FILENAME")
+
+for LINE in $LINES
+do
+    $LINE
+done
+```
+
+And running this code we get:
+
+```
+> comfile.sh 
+> my_commands.txt  testfile-1  testfile-2  testfile-3
+```
+
+Remember that our my_commands.txt file currently contains only the 'ls' command.
+
+Next we'll take a look at formatting and then on to improving, optimizing and securing our code further.
+
+
+
+
